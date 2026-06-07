@@ -4,6 +4,9 @@ from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate,ChatPromptTemplate
 from langchain_core.output_parsers import BaseOutputParser
+from fastapi import FastAPI
+from langserve import add_routes
+
 
 from typing import List
 
@@ -45,7 +48,18 @@ chat_prompt = ChatPromptTemplate.from_messages([
     ("human",human_template),
 ])
 
+#应用定义
+app = FastAPI(
+    title="第一个LangChain应用",
+    version = "0.0.1",
+    description="LangChain应用接口",
+)
+chain = chat_prompt | ChatDeepSeek(model="deepseek-chat") | CSV()
+# 添加链路由
+add_routes(app, chain, path="/first_app")
+
+
     
 if __name__ == "__main__":
-    chain = chat_prompt | ChatDeepSeek(model="deepseek-chat") | CSV()
-    print(chain.invoke({"text":"动物"}))
+    import uvicorn
+    uvicorn.run(app,host="localhost",port=8000)
