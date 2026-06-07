@@ -1,0 +1,22 @@
+# Python 运行产生的缓存（最重要）
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 编辑器或系统产生的临时文件
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 虚拟环境
+venv/
+env/
+.venv/
+
+# 日志文件
+*.log
+
+# 密钥
+.env
