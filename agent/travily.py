@@ -31,12 +31,23 @@ def count_unique_chinese_characters(sentence: str):
     
     return tavily_search_tool.invoke(sentence)
 
+system_prompt = """
+            你是一个严谨的 AI 助手。请严格遵守以下规则：
+            1. 【强制搜索】：即使你认为自己知道答案，也必须调用 count_unique_chinese_characters 进行搜索，以获取最新的参考依据。
+            2. 【引用来源】：在你的最终回答文本的末尾，必须清晰地列出你参考的网页标题（Title）和网址链接（URL）。
 
+            示例输出格式：
+            回答内容......
+            参考来源：
+            - [网页标题1](URL1)
+            - [网页标题2](URL2)
+            """
 
 # 创建一个聊天提示模板
 prompt = ChatPromptTemplate.from_messages(
     [
         ("user", "{input}"),
+        ('system',system_prompt),
         MessagesPlaceholder(variable_name="agent_scratchpad"),
     ]
 )
@@ -61,7 +72,8 @@ def call_executor():
    
     agent_executor = AgentExecutor(agent=agent, tools=[count_unique_chinese_characters], verbose=True)
     response = agent_executor.invoke({"input": sentence})
-    result = structured_llm.invoke(response["output"])
+    extract_prompt = f"请根据以下文本提取信息并按照要求输出 JSON 格式：\n{response['output']}"
+    result = structured_llm.invoke(extract_prompt)
     print(result)
 
 # 主函数
